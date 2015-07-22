@@ -223,7 +223,7 @@ function adb_clean_extra_gecko_files() {
 
     echo "### Cleaning Extra Gecko Files ..."
     GECKO_DIR=$1
-    REMOVED_FILES="$(cat <(ls "$GECKO_DIR/b2g") <(ls "$GECKO_DIR/b2g") <(run_adb shell "ls /system/b2g" | tr -d '\r') | sort | uniq -u)"
+    REMOVED_FILES=$(echo -e "$(ls "$GECKO_DIR/b2g" | cat)\n$(run_adb shell "ls /system/b2g" | tr -d '\r')" | sort | uniq -u)
     if [[ "$REMOVED_FILES" != "" ]]; then
         for REMOVED_FILE in $REMOVED_FILES; do
             if [[ "$REMOVED_FILE" != "defaults" ]] && [[ "$REMOVED_FILE" != "webapps" ]]; then
@@ -355,7 +355,7 @@ do
                 "") echo -e "Please specify the gecko path.\nTry '--help' for more information."; exit 1;;
                 *) FLASH_GECKO_FILE=$2; shift 2;;
             esac ;;
-        --keep_profile) if [[ -e ./backup_restore_profile.py ]]; then KEEP_PROFILE=true; else echo "### There is no backup_restore_profile.py file."; fi; shift;;
+        --keep_profile) if [[ -e ./backup_restore_profile.py ]]; then KEEP_PROFILE=true; else echo "### There is no backup_restore_profile.py file. The '--keep_profile' can not work."; exit 1; fi; shift;;
         -s)
             case "$2" in
                 "") shift 2;;

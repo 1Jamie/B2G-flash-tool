@@ -73,9 +73,26 @@ class AdbHelper(object):
             cmd = 'adb shell'
         else:
             cmd = 'adb -s %s shell' % (serial,)
-        cmd = '%s %s' % (cmd, command)
+        cmd = "%s '%s'" % (cmd, command)
         p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         output = p.communicate()[0]
         AdbHelper.logger.debug('cmd: {0}'.format(cmd))
         AdbHelper.logger.debug('output: {0}'.format(output))
         return output
+
+    @staticmethod
+    def adb_root(serial=None):
+        if serial is None:
+            cmd = 'adb root'
+        else:
+            cmd = 'adb -s %s root' % (serial,)
+        p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output = p.communicate()[0]
+        AdbHelper.logger.debug('cmd: {0}'.format(cmd))
+        AdbHelper.logger.debug('output: {0}'.format(output))
+        if p.returncode is 0 and (not 'cannot' in output):
+            AdbHelper.logger.info(output)
+            return True
+        else:
+            AdbHelper.logger.warning(output)
+            return False
